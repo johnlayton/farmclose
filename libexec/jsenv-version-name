@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Summary: Show the current Ruby version
+set -e
+[ -n "$JSENV_DEBUG" ] && set -x
+
+if [ -z "$JSENV_VERSION" ]; then
+  JSENV_VERSION_FILE="$(jsenv-version-file)"
+  JSENV_VERSION="$(jsenv-version-file-read "$JSENV_VERSION_FILE" || true)"
+fi
+
+if [ -z "$JSENV_VERSION" ] || [ "$JSENV_VERSION" = "system" ]; then
+  echo "system"
+  exit
+fi
+
+version_exists() {
+  local version="$1"
+  [ -d "${JSENV_ROOT}/versions/${version}" ]
+}
+
+if version_exists "$JSENV_VERSION"; then
+  echo "$JSENV_VERSION"
+# elif version_exists "${JSENV_VERSION#ruby-}"; then
+#   { echo "warning: ignoring extraneous \`ruby-' prefix in version \`${JSENV_VERSION}'"
+#     echo "         (set by $(jsenv-version-origin))"
+#   } >&2
+#   echo "${JSENV_VERSION#ruby-}"
+# else
+#   echo "jsenv: version \`$JSENV_VERSION' is not installed" >&2
+#   exit 1
+fi

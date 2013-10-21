@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Summary: List all Node versions available to jsenv
+# Usage: jsenv versions [--bare]
+#
+# Lists all Node versions found in `$JSENV_ROOT/versions/*'.
+
+set -e
+[ -n "$JSENV_DEBUG" ] && set -x
+
+if [ "$1" = "--bare" ]; then
+  hit_prefix=""
+  miss_prefix=""
+  current_version=""
+  include_system=""
+else
+  hit_prefix="* "
+  miss_prefix="  "
+  current_version="$(jsenv-version-name || true)"
+  include_system="1"
+fi
+
+print_version() {
+  if [ "$1" == "$current_version" ]; then
+    echo "${hit_prefix}$(jsenv-version 2>/dev/null)"
+  else
+    echo "${miss_prefix}$1"
+  fi
+}
+
+# Include "system" in the non-bare output, if it exists
+if [ -n "$include_system" ] && JSENV_VERSION=system jsenv-which node >/dev/null 2>&1; then
+  print_version system
+fi
+
+for path in "${JSENV_ROOT}/versions/"*; do
+  if [ -d "$path" ]; then
+    print_version "${path##*/}"
+  fi
+done

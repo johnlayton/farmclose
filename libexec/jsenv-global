@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+#
+# Summary: Set or show the global Node version
+#
+# Usage: jsenv global <version>
+#
+# Sets the global Node version. You can override the global version at
+# any time by setting a directory-specific version with `jsenv local'
+# or by setting the `JSENV_VERSION' environment variable.
+#
+# <version> should be a string matching a Node version known to jsenv.
+# The special version string `system' will use your default system Node.
+# Run `jsenv versions' for a list of available Ruby versions.
+
+set -e
+[ -n "$JSENV_DEBUG" ] && set -x
+
+# Provide jsenv completions
+if [ "$1" = "--complete" ]; then
+  echo system
+  exec jsenv-versions --bare
+fi
+
+JSENV_VERSION="$1"
+JSENV_VERSION_FILE="${JSENV_ROOT}/version"
+
+if [ -n "$JSENV_VERSION" ]; then
+  jsenv-version-file-write "$JSENV_VERSION_FILE" "$JSENV_VERSION"
+else
+  jsenv-version-file-read "$JSENV_VERSION_FILE" ||
+  jsenv-version-file-read "${JSENV_ROOT}/global" ||
+  jsenv-version-file-read "${JSENV_ROOT}/default" ||
+  echo system
+fi

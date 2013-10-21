@@ -1,0 +1,159 @@
+#!/usr/bin/env bash
+# Summary: Install new version of node
+
+set -e
+[ -n "$JSENV_DEBUG" ] && set -x
+
+install() {
+
+  local os=
+  local uname="$(uname -a)"
+  local arch="$(uname -m)"
+  case "$uname" in
+    Linux\ *)   os=linux ;;
+    Darwin\ *)  os=darwin ;;
+    SunOS\ *)   os=sunos ;;
+    FreeBSD\ *) os=freebsd ;;
+  esac
+  case "$uname" in
+    *x86_64*) arch=x64 ;;
+    *i*86*)   arch=x86 ;;
+    *armv6l*) arch=arm-pi ;;
+  esac
+
+  # initialize local variables
+  local VERSION
+  local ADDITIONAL_PARAMETERS
+
+  local binavail
+  local t
+  local url
+  local sum
+  local tarball
+  local shasum='shasum'
+  local nobinary
+
+  if [ ! `which curl` ]; then
+    echo 'jsenv needs curl to proceed.' >&2;
+  fi
+
+#  if [ -z "`which shasum`" ]; then
+#    shasum='sha1sum'
+#  fi
+
+  if [ $# -lt 1 ]; then
+    return
+  fi
+
+  nobinary=0
+  if [ "$1" = "-s" ]; then
+    nobinary=1
+    shift
+  fi
+
+  if [ "$os" = "freebsd" ]; then
+    nobinary=1
+  fi
+
+  VERSION="$@"
+  ADDITIONAL_PARAMETERS=''
+
+  shift
+
+  while [ $# -ne 0 ]
+  do
+    ADDITIONAL_PARAMETERS="$ADDITIONAL_PARAMETERS $1"
+    shift
+  done
+
+  [ -d "${JSENV_ROOT}/versions/$VERSION" ] && echo "$VERSION is already installed." && return
+
+  # skip binary install if no binary option specified.
+  if [ $nobinary -ne 1 ]; then
+    # shortcut - try the binary if possible.
+    if [ -n "$os" ]; then
+      binavail=
+      # binaries started with node 0.8.6
+      case "$VERSION" in
+        v0.8.[012345])  binavail=0 ;;
+        v0.[1234567].*) binavail=0 ;;
+        *) binavail=1 ;;
+      esac
+      if [ $binavail -eq 1 ]; then
+        t="$VERSION-$os-$arch"
+        url="http://nodejs.org/dist/v$VERSION/node-v${t}.tar.gz"
+#        sum=`curl -v -s http://nodejs.org/dist/$VERSION/SHASUMS.txt | \grep node-${t}.tar.gz | awk '{print $1}'`
+        local tmpdir="/tmp/node-${t}"
+        local tmptarball="$tmpdir/node-${t}.tar.gz"
+        if (
+          mkdir -p "$tmpdir" && \
+          curl -C - --progress-bar $url -o "$tmptarball" && \
+#          nvm_checksum `${shasum} "$tmptarball" | awk '{print $1}'` $sum && \
+          tar -xzf "$tmptarball" -C "$tmpdir" --strip-components 1 && \
+          mv "$tmpdir" "${JSENV_ROOT}/versions/$VERSION" && \
+          rm -f "$tmptarball"
+          )
+        then
+          jsenv-version-file-write .node-version "$VERSION"
+          return;
+        else
+          echo "Binary download failed, trying source." >&2
+          rm -rf "$tmptarball" "$tmpdir"
+        fi
+      fi
+    fi
+  fi
+
+  echo "Additional options while compiling: $ADDITIONAL_PARAMETERS"
+
+  tarball=''
+  sum=''
+  make='make'
+  if [ "$os" = "freebsd" ]; then
+  make='gmake'
+  fi
+  local tmpdir="/tmp/src"
+  local tmptarball="$tmpdir/node-$VERSION.tar.gz"
+  if [ "`curl -Is "http://nodejs.org/dist/v$VERSION/node-v$VERSION.tar.gz" | \grep '200 OK'`" != '' ]; then
+    tarball="http://nodejs.org/dist/v$VERSION/node-v$VERSION.tar.gz"
+    #sum=`curl -s http://nodejs.org/dist/$VERSION/SHASUMS.txt | \grep node-$VERSION.tar.gz | awk '{print $1}'`
+  elif [ "`curl -Is "http://nodejs.org/dist/node-v$VERSION.tar.gz" | \grep '200 OK'`" != '' ]; then
+    tarball="http://nodejs.org/dist/node-v$VERSION.tar.gz"
+  fi
+  if (
+    [ ! -z $tarball ] && \
+    mkdir -p "$tmpdir" && \
+    curl --progress-bar $tarball -o "$tmptarball" && \
+    #if [ "$sum" = "" ]; then : ; else nvm_checksum `${shasum} "$tmptarball" | awk '{print $1}'` $sum; fi && \
+    tar -xzf "$tmptarball" -C "$tmpdir" && \
+    cd "$tmpdir/node-$VERSION" && \
+    ./configure --prefix="${JSENV_ROOT}/versions/$VERSION" $ADDITIONAL_PARAMETERS && \
+    $make && \
+    rm -f "${JSENV_ROOT}/versions/$VERSION" 2>/dev/null && \
+    $make install
+    )
+  then
+    jsenv-version-file-write .node-version "$VERSION"
+    if ! which npm ; then
+      echo "Installing npm..."
+      if [[ "`expr match $VERSION '\(^v0\.1\.\)'`" != '' ]]; then
+        echo "npm requires node v0.2.3 or higher"
+      elif [[ "`expr match $VERSION '\(^v0\.2\.\)'`" != '' ]]; then
+        if [[ "`expr match $VERSION '\(^v0\.2\.[0-2]$\)'`" != '' ]]; then
+          echo "npm requires node v0.2.3 or higher"
+        else
+          curl https://npmjs.org/install.sh | clean=yes npm_install=0.2.19 sh
+        fi
+      else
+        curl https://npmjs.org/install.sh | clean=yes sh
+      fi
+    fi
+  else
+    echo "jsenv: install $VERSION failed!"
+    return 1
+  fi
+}
+
+echo "Install Node $@"
+
+install "$@"

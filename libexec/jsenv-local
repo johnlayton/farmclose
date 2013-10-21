@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+#
+# Summary: Set or show the local application-specific Node version
+#
+# Usage: jsenv local <version>
+#        jsenv local --unset
+#
+# Sets the local application-specific Node version by writing the
+# version name to a file named `.node-version'.
+#
+# When you run a Node command, jsenv will look for a `.node-version'
+# file in the current directory and each parent directory. If no such
+# file is found in the tree, jsenv will use the global Node version
+# specified with `jsenv global'. A version specified with the
+# `JSENV_VERSION' environment variable takes precedence over local
+# and global versions.
+#
+# For backwards compatibility, jsenv will also read version
+# specifications from `.jsenv-version' files, but a `.node-version'
+# file in the same directory takes precedence.
+#
+# <version> should be a string matching a Node version known to jsenv.
+# The special version string `system' will use your default system Node.
+# Run `jsenv versions' for a list of available Node versions.
+
+set -e
+[ -n "$JSENV_DEBUG" ] && set -x
+
+# Provide jsenv completions
+if [ "$1" = "--complete" ]; then
+  echo --unset
+  echo system
+  exec jsenv-versions --bare
+fi
+
+JSENV_VERSION="$1"
+
+if [ "$JSENV_VERSION" = "--unset" ]; then
+  rm -f .node-version .jsenv-version
+elif [ -n "$JSENV_VERSION" ]; then
+  if [ "$(JSENV_VERSION= jsenv-version-origin)" -ef .jsenv-version ]; then
+    rm -f .jsenv-version
+    { echo "jsenv: removed existing \`.jsenv-version' file and migrated"
+      echo "       local version specification to \`.node-version' file"
+    } >&2
+  fi
+  jsenv-version-file-write .node-version "$JSENV_VERSION"
+else
+  jsenv-version-file-read .node-version ||
+  jsenv-version-file-read .jsenv-version ||
+  { echo "jsenv: no local version configured for this directory"
+    exit 1
+  } >&2
+fi

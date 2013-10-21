@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+#
+# Summary: Display the full path to an executable
+#
+# Usage: jsenv which <command>
+#
+# Displays the full path to the executable that jsenv will invoke when
+# you run the given command.
+
+set -e
+[ -n "$JSENV_DEBUG" ] && set -x
+
+# Provide jsenv completions
+if [ "$1" = "--complete" ]; then
+  exec jsenv shims --short
+fi
+
+expand_path() {
+  if [ ! -d "$1" ]; then
+    return 1
+  fi
+
+  local cwd="$(pwd)"
+  cd "$1"
+  pwd
+  cd "$cwd"
+}
+
+remove_from_path() {
+  local path_to_remove="$(expand_path "$1")"
+  local result=""
+
+  if [ -z "$path_to_remove" ]; then
+    echo "${PATH}"
+    return
+  fi
+
+  local paths
+  IFS=: paths=($PATH)
+
+  for path in "${paths[@]}"; do
+    path="$(expand_path "$path" || true)"
+    if [ -n "$path" ] && [ "$path" != "$path_to_remove" ]; then
+      result="${result}${path}:"
+    fi
+  done
+
+  echo "${result%:}"
+}
+
+JSENV_VERSION="$(jsenv-version-name)"
+JSENV_COMMAND="$1"
+
+if [ -z "$JSENV_COMMAND" ]; then
+  jsenv-help --usage which >&2
+  exit 1
+fi
+
+if [ "$JSENV_VERSION" = "system" ]; then
+  PATH="$(remove_from_path "${JSENV_ROOT}/shims")"
+  JSENV_COMMAND_PATH="$(command -v "$JSENV_COMMAND" || true)"
+else
+  JSENV_COMMAND_PATH="${JSENV_ROOT}/versions/${JSENV_VERSION}/bin/${JSENV_COMMAND}"
+fi
+
+for script in $(jsenv-hooks which); do
+  source "$script"
+done
+
+if [ -x "$JSENV_COMMAND_PATH" ]; then
+  echo "$JSENV_COMMAND_PATH"
+else
+  echo "jsenv: $JSENV_COMMAND: command not found" >&2
+
+  versions="$(jsenv-whence "$JSENV_COMMAND" || true)"
+  if [ -n "$versions" ]; then
+    { echo
+      echo "The \`$1' command exists in these Node versions:"
+      echo "$versions" | sed 's/^/  /g'
+      echo
+    } >&2
+  fi
+
+  exit 127
+fi

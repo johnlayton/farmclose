@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Summary: List all Node versions that contain the given executable
+# Usage: jsenv whence [--path] <command>
+
+set -e
+[ -n "$JSENV_DEBUG" ] && set -x
+
+# Provide jsenv completions
+if [ "$1" = "--complete" ]; then
+  echo --path
+  exec jsenv shims --short
+fi
+
+if [ "$1" = "--path" ]; then
+  print_paths="1"
+  shift
+else
+  print_paths=""
+fi
+
+whence() {
+  local command="$1"
+  jsenv-versions --bare | while read version; do
+    path="$(jsenv-prefix "$version")/bin/${command}"
+    if [ -x "$path" ]; then
+      [ "$print_paths" ] && echo "$path" || echo "$version"
+    fi
+  done
+}
+
+JSENV_COMMAND="$1"
+if [ -z "$JSENV_COMMAND" ]; then
+  jsenv-help --usage whence >&2
+  exit 1
+fi
+
+result="$(whence "$JSENV_COMMAND")"
+[ -n "$result" ] && echo "$result"

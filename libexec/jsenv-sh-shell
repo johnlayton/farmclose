@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+#
+# Summary: Set or show the shell-specific Node version
+#
+# Usage: jsenv shell <version>
+#        jsenv shell --unset
+#
+# Sets a shell-specific Node version by setting the `JSENV_VERSION'
+# environment variable in your shell. This version overrides local
+# application-specific versions and the global version.
+#
+# <version> should be a string matching a Node version known to jsenv.
+# The special version string `system' will use your default system Node.
+# Run `jsenv versions' for a list of available Node versions.
+
+set -e
+[ -n "$JSENV_DEBUG" ] && set -x
+
+# Provide jsenv completions
+if [ "$1" = "--complete" ]; then
+  echo --unset
+  echo system
+  exec jsenv-versions --bare
+fi
+
+version="$1"
+
+if [ -z "$version" ]; then
+  if [ -z "$JSENV_VERSION" ]; then
+    echo "jsenv: no shell-specific version configured" >&2
+    exit 1
+  else
+    echo "echo \"\$JSENV_VERSION\""
+    exit
+  fi
+fi
+
+if [ "$version" = "--unset" ]; then
+  echo "unset JSENV_VERSION"
+  exit
+fi
+
+# Make sure the specified version is installed.
+if jsenv-prefix "$version" >/dev/null; then
+  echo "export JSENV_VERSION=\"${version}\""
+else
+  echo "return 1"
+  exit 1
+fi

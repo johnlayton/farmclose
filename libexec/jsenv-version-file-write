@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Usage: jsenv version-file-write <file> <version>
+
+set -e
+[ -n "$JSENV_DEBUG" ] && set -x
+
+JSENV_VERSION_FILE="$1"
+JSENV_VERSION="$2"
+
+if [ -z "$JSENV_VERSION" ] || [ -z "$JSENV_VERSION_FILE" ]; then
+  jsenv-help --usage version-file-write >&2
+  exit 1
+fi
+
+# Make sure the specified version is installed.
+jsenv-prefix "$JSENV_VERSION" >/dev/null
+
+# Write the version out to disk.
+echo "$JSENV_VERSION" > "$JSENV_VERSION_FILE"

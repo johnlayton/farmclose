@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+#
+# Summary: Run an executable with the selected Node version
+#
+# Usage: jsenv exec <command> [arg1 arg2...]
+#
+# Runs an executable by first preparing PATH so that the selected Node
+# version's `bin' directory is at the front.
+#
+# For example, if the currently selected Node version is 0.10.2:
+#   jsenv exec nodemon -w file.js main.js
+#
+# is equivalent to:
+#   PATH="$JSENV_ROOT/versions/0.10.2/bin:$PATH" nodemon -w file.js main.js
+
+set -e
+[ -n "$JSENV_DEBUG" ] && set -x
+
+# Provide jsenv completions
+if [ "$1" = "--complete" ]; then
+  exec jsenv shims --short
+fi
+
+export JSENV_VERSION="$(jsenv-version-name)"
+JSENV_COMMAND="$1"
+
+if [ -z "$JSENV_COMMAND" ]; then
+  jsenv-help --usage exec >&2
+  exit 1
+fi
+
+JSENV_COMMAND_PATH="$(jsenv-which "$JSENV_COMMAND")"
+JSENV_BIN_PATH="${JSENV_COMMAND_PATH%/*}"
+
+for script in $(jsenv-hooks exec); do
+  source "$script"
+done
+
+shift 1
+if [ "$JSENV_VERSION" != "system" ]; then
+  export PATH="${JSENV_BIN_PATH}:${PATH}"
+fi
+exec -a "$JSENV_COMMAND" "$JSENV_COMMAND_PATH" "$@"
