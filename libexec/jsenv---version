@@ -12,7 +12,7 @@
 set -e
 [ -n "$JSENV_DEBUG" ] && set -x
 
-version="0.0.1"
+version="0.0.2"
 
 cd "$JSENV_ROOT"
 git_revision="$(git describe --tags HEAD 2>/dev/null || true)"
