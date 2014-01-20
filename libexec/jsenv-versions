@@ -9,11 +9,13 @@ set -e
 
 if [ "$1" = "--bare" ]; then
   hit_prefix=""
+  inst_prefix=""
   miss_prefix=""
   current_version=""
   include_system=""
 else
   hit_prefix="* "
+  inst_prefix="+ "
   miss_prefix="  "
   current_version="$(jsenv-version-name || true)"
   include_system="1"
@@ -21,9 +23,11 @@ fi
 
 print_version() {
   if [ "$1" == "$current_version" ]; then
-    echo "${hit_prefix}$(jsenv-version 2>/dev/null)"
+    echo "${hit_prefix}${inst_prefix}$(jsenv-version 2>/dev/null)"
+  elif [[ -d  "${JSENV_ROOT}/versions/$1" ]]; then
+    echo "${miss_prefix}${inst_prefix}$1"
   else
-    echo "${miss_prefix}$1"
+    echo "${miss_prefix}${miss_prefix}$1"
   fi
 }
 
@@ -32,8 +36,6 @@ if [ -n "$include_system" ] && JSENV_VERSION=system jsenv-which node >/dev/null 
   print_version system
 fi
 
-for path in "${JSENV_ROOT}/versions/"*; do
-  if [ -d "$path" ]; then
-    print_version "${path##*/}"
-  fi
+for path in `curl -X get https://semver.io/node/versions`; do
+  print_version "${path##*/}"
 done

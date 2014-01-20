@@ -55,7 +55,14 @@ install() {
     nobinary=1
   fi
 
-  VERSION="$@"
+  if [[ $@ == unstable ]]; then
+    VERSION="`curl -X GET http://semver.io/node/unstable`"
+  elif [[ $@ == stable ]]; then
+    VERSION="`curl -X GET http://semver.io/node/stable`"
+  else
+    VERSION="$@"
+  fi
+
   ADDITIONAL_PARAMETERS=''
 
   shift
