@@ -89,7 +89,8 @@ install() {
       esac
       if [ $binavail -eq 1 ]; then
         t="$VERSION-$os-$arch"
-        url="http://nodejs.org/dist/v$VERSION/node-v${t}.tar.gz"
+        url="https://gist.github.com/raw/3245130/v0.10.24/node-v0.10.24-linux-arm-armv6j-vfp-hard.bin"
+        #url="http://nodejs.org/dist/v$VERSION/node-v${t}.tar.gz"
         echo "Download " $url
 #        sum=`curl -v -s http://nodejs.org/dist/$VERSION/SHASUMS.txt | \grep node-${t}.tar.gz | awk '{print $1}'`
         local tmpdir="/tmp/node-${t}"
@@ -101,7 +102,7 @@ install() {
           tar -xzf "$tmptarball" -C "$tmpdir" --strip-components 1 && \
           mv "$tmpdir" "${JSENV_ROOT}/versions/$VERSION" && \
           rm -f "$tmptarball"
-          )
+        )
         then
           jsenv-version-file-write .node-version "$VERSION"
           return;
