@@ -3,11 +3,17 @@ RBEnv for Node
 
 ## Installation
 
+### Basic Homebrew Install
+
 If you're on Mac OS X, consider
 [installing with Homebrew](#homebrew-on-mac-os-x).
 
     ~~~ sh
-    brew install https://raw.github.com/johnlayton/farmclose/master/jsenv.rb
+    $ brew install https://raw.github.com/johnlayton/farmclose/master/jsenv.rb
+    ~~~
+
+    ~~~ sh
+    $ git clone https://github.com/johnlayton/farmclose.git ~/.jsenv
     ~~~
 
 ### Basic GitHub Checkout
