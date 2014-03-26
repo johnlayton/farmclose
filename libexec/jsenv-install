@@ -38,13 +38,19 @@ install() {
     echo 'jsenv needs curl to proceed.' >&2;
   fi
 
-#  if [ -z "`which shasum`" ]; then
-#    shasum='sha1sum'
-#  fi
-
   if [ $# -lt 1 ]; then
     return
   fi
+
+  if [[ $1 == unstable ]]; then
+    VERSION="`curl -X GET http://semver.io/node/unstable`"
+  elif [[ $1 == stable ]]; then
+    VERSION="`curl -X GET http://semver.io/node/stable`"
+  else
+    VERSION="$@"
+  fi
+
+  shift
 
   nobinary=0
   if [ "$1" = "-s" ]; then
@@ -54,14 +60,6 @@ install() {
 
   if [ "$os" = "freebsd" ]; then
     nobinary=1
-  fi
-
-  if [[ $@ == unstable ]]; then
-    VERSION="`curl -X GET http://semver.io/node/unstable`"
-  elif [[ $@ == stable ]]; then
-    VERSION="`curl -X GET http://semver.io/node/stable`"
-  else
-    VERSION="$@"
   fi
 
   ADDITIONAL_PARAMETERS=''
