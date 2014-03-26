@@ -18,9 +18,9 @@ install() {
   case "$arch" in
     *x86_64*) arch=x64 ;;
     *i*86*)   arch=x86 ;;
-    *armv6l*) arch=x86 ;;
+    *armv6l*) arch=arm-pi ;;
   esac
-  #*armv6l*) arch=arm-pi ;;
+    #*armv6l*) arch=x86 ;;
 
   # initialize local variables
   local VERSION
@@ -122,23 +122,24 @@ install() {
   fi
   local tmpdir="/tmp/src"
   local tmptarball="$tmpdir/node-$VERSION.tar.gz"
+
   if [ "`curl -Is "http://nodejs.org/dist/v$VERSION/node-v$VERSION.tar.gz" | \grep '200 OK'`" != '' ]; then
     tarball="http://nodejs.org/dist/v$VERSION/node-v$VERSION.tar.gz"
   elif [ "`curl -Is "http://nodejs.org/dist/node-v$VERSION.tar.gz" | \grep '200 OK'`" != '' ]; then
     tarball="http://nodejs.org/dist/node-v$VERSION.tar.gz"
   fi
+
   if (
     [ ! -z $tarball ] && \
     mkdir -p "$tmpdir" && \
     curl --progress-bar $tarball -o "$tmptarball" && \
-    #if [ "$sum" = "" ]; then : ; else nvm_checksum `${shasum} "$tmptarball" | awk '{print $1}'` $sum; fi && \
     tar -xzf "$tmptarball" -C "$tmpdir" && \
-    cd "$tmpdir/node-$VERSION" && \
+    cd "$tmpdir/node-v$VERSION" && \
     ./configure --prefix="${JSENV_ROOT}/versions/$VERSION" $ADDITIONAL_PARAMETERS && \
     $make && \
     rm -f "${JSENV_ROOT}/versions/$VERSION" 2>/dev/null && \
     $make install
-    )
+  )
   then
     jsenv-version-file-write .node-version "$VERSION"
     if ! which npm ; then
