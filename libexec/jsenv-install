@@ -89,7 +89,7 @@ install() {
       if [ $binavail -eq 1 ]; then
         t="$VERSION-$os-$arch"
         url="http://nodejs.org/dist/v$VERSION/node-v${t}.tar.gz"
-        echo "Download " + url
+        echo "Download " $url
 #        sum=`curl -v -s http://nodejs.org/dist/$VERSION/SHASUMS.txt | \grep node-${t}.tar.gz | awk '{print $1}'`
         local tmpdir="/tmp/node-${t}"
         local tmptarball="$tmpdir/node-${t}.tar.gz"
