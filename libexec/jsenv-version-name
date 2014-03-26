@@ -20,6 +20,7 @@ version_exists() {
 
 if version_exists "$JSENV_VERSION"; then
   echo "$JSENV_VERSION"
+
 # elif version_exists "${JSENV_VERSION#ruby-}"; then
 #   { echo "warning: ignoring extraneous \`ruby-' prefix in version \`${JSENV_VERSION}'"
 #     echo "         (set by $(jsenv-version-origin))"
@@ -28,4 +29,5 @@ if version_exists "$JSENV_VERSION"; then
 # else
 #   echo "jsenv: version \`$JSENV_VERSION' is not installed" >&2
 #   exit 1
+
 fi
