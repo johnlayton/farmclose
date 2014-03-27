@@ -8,12 +8,16 @@ RBEnv for Node
 If you're on Mac OS X, consider
 [installing with Homebrew](#homebrew-on-mac-os-x).
 
+1. Install using brew command
+
     ~~~ sh
     $ brew install https://raw.github.com/johnlayton/farmclose/master/jsenv.rb
     ~~~
 
+2. Upgrade using brew command
+
     ~~~ sh
-    $ git clone https://github.com/johnlayton/farmclose.git ~/.jsenv
+    $ brew upgrade https://raw.github.com/johnlayton/farmclose/master/jsenv.rb
     ~~~
 
 ### Basic GitHub Checkout
@@ -63,10 +67,10 @@ The `jsenv install` command ships with jsenv out of the box. If you
 installed it either as part of GitHub checkout process outlined above 
 or via Homebrew, you should be able to:
 
-    ~~~ sh
-    # install a Node version:
-    $ jsenv install 0.10.26
-    ~~~
+~~~ sh
+# install a Node version:
+$ jsenv install 0.10.26
+~~~
 
 Alternatively to the `install` command, you can download and compile
 Node manually as a subdirectory of `~/.jsenv/versions/`. An entry in
