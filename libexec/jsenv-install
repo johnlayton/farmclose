@@ -148,7 +148,7 @@ install() {
           curl https://npmjs.org/install.sh | clean=yes npm_install=0.2.19 sh
         fi
       else
-        curl https://npmjs.org/install.sh | clean=yes sh
+        curl https://www.npmjs.org/install.sh | clean=yes sh
       fi
     fi
   else
