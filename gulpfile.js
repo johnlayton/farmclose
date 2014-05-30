@@ -20,7 +20,11 @@ gulp.task( 'conf', [ 'dist' ], function () {
       version : version,
       shasum  : shasum( require( 'fs' ).readFileSync( './dist/jsenv-' + version +  '.tar.gz' ) )
     } ) )
-    .pipe( gulp.dest( 'dist' ) );
+    .pipe( gulp.dest( '.' ) );
+} );
+
+gulp.task( 'install', function() {
+
 } );
 
 gulp.task( 'build', ['dist', 'conf'] );

@@ -2,8 +2,8 @@ require 'formula'
 
 class Jsenv < Formula
   homepage ''
-  url 'https://github.com/johnlayton/farmclose/raw/master/dist/jsenv-0.0.5.tar.gz'
-  sha1 '64e2a8644d35c040776c942e60b5355fb3c61706'
+  url 'https://github.com/johnlayton/farmclose/raw/master/dist/jsenv-0.0.6.tar.gz'
+  sha1 '8af4d41c792dc7ab9d2c3db5e9ded2870c821a1d'
 
   def install
     inreplace 'libexec/jsenv', '/usr/local', HOMEBREW_PREFIX
