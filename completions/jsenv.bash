@@ -1,3 +1,4 @@
+#!/bin/sh
 _jsenv() {
   COMPREPLY=()
   local word="${COMP_WORDS[COMP_CWORD]}"

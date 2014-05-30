@@ -36,6 +36,12 @@ if [ -n "$include_system" ] && JSENV_VERSION=system jsenv-which node >/dev/null 
   print_version system
 fi
 
-for path in `curl -X get https://semver.io/node/versions`; do
-  print_version "${path##*/}"
+#for path in `curl -X get https://semver.io/node/versions`; do
+#  print_version "${path##*/}"
+#done
+
+for path in "${JSENV_ROOT}/versions/"*; do
+  if [ -d "$path" ]; then
+    print_version "${path##*/}"
+  fi
 done
