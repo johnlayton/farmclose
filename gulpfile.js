@@ -3,11 +3,24 @@ var tar = require( 'gulp-tar' );
 var gzip = require( 'gulp-gzip' );
 var tmpl = require( 'gulp-template' );
 var shasum = require( 'shasum' );
+var gulpFilter = require('gulp-filter');
+var path = require( 'path' );
+
+//var filter = gulpFilter([ './bin/*', './libexec/*', './completions/*' ]);
+
+var filter = gulpFilter(
+  function (file) {
+    var relative = path.relative( ".", file.path );
+    var match = /^bin|libexec|completions\/.*$/.test(relative);
+    return match;
+  }
+);
 
 var version = require( './package.json' ).version;
 
 gulp.task( 'dist', function () {
-  return gulp.src( ['./bin/*', './libexec/*', './completions/*'] )
+  return gulp.src( '**/*' )
+    .pipe( filter )
     .pipe( tar( 'jsenv-' + version + '.tar' ) )
     .pipe( gzip() )
     .pipe( gulp.dest( './dist' ) );
