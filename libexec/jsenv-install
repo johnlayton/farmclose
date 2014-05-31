@@ -40,24 +40,21 @@ install() {
     return
   fi
 
+  nobinary=0
+  if [ "$1" = "-s" ]; then
+    nobinary=1
+    shift
+  fi
+  if [ "$os" = "freebsd" ]; then
+    nobinary=1
+  fi
+
   if [[ $1 == unstable ]]; then
     VERSION="`curl -X GET http://semver.io/node/unstable`"
   elif [[ $1 == stable ]]; then
     VERSION="`curl -X GET http://semver.io/node/stable`"
   else
     VERSION="$@"
-  fi
-
-  shift
-
-  nobinary=0
-  if [ "$1" = "-s" ]; then
-    nobinary=1
-    shift
-  fi
-
-  if [ "$os" = "freebsd" ]; then
-    nobinary=1
   fi
 
   ADDITIONAL_PARAMETERS=''
