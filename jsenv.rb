@@ -2,7 +2,8 @@ require 'formula'
 
 class Jsenv < Formula
   homepage ''
-  url 'https://github.com/johnlayton/farmclose/raw/master/dist/jsenv-0.0.8.tar.gz'
+  url 'https://github.com/johnlayton/farmclose/raw/master/dist/jsenv-0.0.9.tar.gz'
+  url 'https://github.com/johnlayton/farmclose/raw/master/dist/jsenv-0.0.9.tar.gz'
   sha1 '4d8e07f2c900dc05bf5305e4e25082c32a58689f'
 
   def install
