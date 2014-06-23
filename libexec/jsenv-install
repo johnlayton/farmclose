@@ -84,6 +84,7 @@ install() {
         local tmpdir="/tmp/node-${t}"
         local tmptarball="$tmpdir/node-${t}.tar.gz"
         if (
+          echo $url && \
           mkdir -p "$tmpdir" && \
           curl -C - --progress-bar $url -o "$tmptarball" && \
           tar -xzf "$tmptarball" -C "$tmpdir" --strip-components 1 && \
