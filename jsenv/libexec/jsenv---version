@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Summary: Display the version of rbenv
+# Summary: Display the version of jsenv
 #
-# Displays the version number of this rbenv release, including the
+# Displays the version number of this jsenv release, including the
 # current revision from git, if available.
 #
 # The format of the git revision is:
@@ -12,7 +12,7 @@
 set -e
 [ -n "$JSENV_DEBUG" ] && set -x
 
-version="0.1.0"
+version="0.1.1"
 
 cd "$JSENV_ROOT"
 git_revision="$(git describe --tags HEAD 2>/dev/null || true)"

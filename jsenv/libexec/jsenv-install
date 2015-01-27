@@ -52,29 +52,27 @@ install() {
     nobinary=1
   fi
 
-  if [[ $1 == node ]]; then
+  if [[ $1 == "node" ]]; then
     GROUP="nodejs"
     PRODUCT="node"
-  elif [[ $1 == iojs ]]; then
+  elif ([ $1 == "iojs" ] || [ $1 == "io" ]); then
     GROUP="iojs"
     PRODUCT="iojs"
   fi
   shift
 
-  if [[ $1 == unstable ] && $PRODUCT == 'node']; then
+  if ([ $1 == unstable ] && [ $PRODUCT == "node" ]); then
     VERSION="`curl -X GET http://semver.io/node/unstable`"
-  elif [[ $1 == stable ] && $PRODUCT == 'node']; then
+  elif ([ $1 == stable ] && [ $PRODUCT == "node" ]); then
     VERSION="`curl -X GET http://semver.io/node/stable`"
-  elif [[ $1 == latest ] && $PRODUCT == 'iojs']; then
+  elif ([ $1 == latest ] && [ $PRODUCT == "iojs" ]); then
     VERSION="`curl -X GET http://semver.io/iojs/stable`"
   else
     VERSION="$@"
   fi
-
-  ADDITIONAL_PARAMETERS=''
-
   shift
 
+  ADDITIONAL_PARAMETERS=''
   while [ $# -ne 0 ]
   do
     ADDITIONAL_PARAMETERS="$ADDITIONAL_PARAMETERS $1"
@@ -94,15 +92,15 @@ install() {
       esac
       if [ $binavail -eq 1 ]; then
         t="$VERSION-$os-$arch"
-        url="http://$GROUPjs.org/dist/v$VERSION/$PRODUCT-v${t}.tar.gz"
+        url="http://${GROUP}.org/dist/v$VERSION/$PRODUCT-v${t}.tar.gz"
         local tmpdir="/tmp/node-${t}"
         local tmptarball="$tmpdir/node-${t}.tar.gz"
         if (
           echo $url && \
           mkdir -p "$tmpdir" && \
-          curl -C - --progress-bar $url -o "$tmptarball" && \
+          curl -L -C - --progress-bar $url -o "$tmptarball" && \
           tar -xzf "$tmptarball" -C "$tmpdir" --strip-components 1 && \
-          mv "$tmpdir" "${JSENV_ROOT}/versions/$VERSION" && \
+          mv "$tmpdir" "${JSENV_ROOT}/versions/$PRODUCT-$VERSION" && \
           rm -f "$tmptarball"
         )
         then
@@ -131,10 +129,10 @@ install() {
   local tmpdir="/tmp/src"
   local tmptarball="$tmpdir/node-$VERSION.tar.gz"
 
-  if [ "`curl -Is "http://$GROUPjs.org/dist/v$VERSION/$PRODUCT-v$VERSION.tar.gz" | \grep '200 OK'`" != '' ]; then
-    tarball="http://$GROUPjs.org/dist/v$VERSION/node-v$VERSION.tar.gz"
-  elif [ "`curl -Is "http://$GROUPjs.org/dist/$PRODUCT-v$VERSION.tar.gz" | \grep '200 OK'`" != '' ]; then
-    tarball="http://$GROUPjs.org/dist/node-v$VERSION.tar.gz"
+  if [ "`curl -Is "http://$GROUP.org/dist/v$VERSION/$PRODUCT-v$VERSION.tar.gz" | \grep '200 OK'`" != '' ]; then
+    tarball="http://$GROUP.org/dist/v$VERSION/node-v$VERSION.tar.gz"
+  elif [ "`curl -Is "http://$GROUP.org/dist/$PRODUCT-v$VERSION.tar.gz" | \grep '200 OK'`" != '' ]; then
+    tarball="http://$GROUP.org/dist/$PRODUCT-v$VERSION.tar.gz"
   fi
 
   if (
@@ -143,9 +141,9 @@ install() {
     curl --progress-bar $tarball -o "$tmptarball" && \
     tar -xzf "$tmptarball" -C "$tmpdir" && \
     cd "$tmpdir/node-v$VERSION" && \
-    ./configure --prefix="${JSENV_ROOT}/versions/$VERSION" $ADDITIONAL_PARAMETERS && \
+    ./configure --prefix="${JSENV_ROOT}/versions/$PRODUCT-$VERSION" $ADDITIONAL_PARAMETERS && \
     $make && \
-    rm -f "${JSENV_ROOT}/versions/$VERSION" 2>/dev/null && \
+    rm -f "${JSENV_ROOT}/versions/$PRODUCT-$VERSION" 2>/dev/null && \
     $make install
   )
   then
