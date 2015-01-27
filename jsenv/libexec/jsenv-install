@@ -7,6 +7,7 @@ set -e
 install() {
 
   local os=
+
   local uname="$(uname -a)"
   case "$uname" in
     Linux\ *)   os=linux ;;
@@ -24,6 +25,8 @@ install() {
     #*armv6l*) arch=x86 ;;
 
   # initialize local variables
+  local GROUP
+  local PRODUCT
   local VERSION
   local ADDITIONAL_PARAMETERS
 
@@ -49,10 +52,21 @@ install() {
     nobinary=1
   fi
 
-  if [[ $1 == unstable ]]; then
+  if [[ $1 == node ]]; then
+    GROUP="nodejs"
+    PRODUCT="node"
+  elif [[ $1 == iojs ]]; then
+    GROUP="iojs"
+    PRODUCT="iojs"
+  fi
+  shift
+
+  if [[ $1 == unstable ] && $PRODUCT == 'node']; then
     VERSION="`curl -X GET http://semver.io/node/unstable`"
-  elif [[ $1 == stable ]]; then
+  elif [[ $1 == stable ] && $PRODUCT == 'node']; then
     VERSION="`curl -X GET http://semver.io/node/stable`"
+  elif [[ $1 == latest ] && $PRODUCT == 'iojs']; then
+    VERSION="`curl -X GET http://semver.io/iojs/stable`"
   else
     VERSION="$@"
   fi
@@ -67,7 +81,7 @@ install() {
     shift
   done
 
-  [ -d "${JSENV_ROOT}/versions/$VERSION" ] && echo "$VERSION is already installed." && return
+  [ -d "${JSENV_ROOT}/versions/$PRODUCT-$VERSION" ] && echo "$PRODUCT-$VERSION is already installed." && return
 
   if [ $nobinary -ne 1 ]; then
 
@@ -80,7 +94,7 @@ install() {
       esac
       if [ $binavail -eq 1 ]; then
         t="$VERSION-$os-$arch"
-        url="http://nodejs.org/dist/v$VERSION/node-v${t}.tar.gz"
+        url="http://$GROUPjs.org/dist/v$VERSION/$PRODUCT-v${t}.tar.gz"
         local tmpdir="/tmp/node-${t}"
         local tmptarball="$tmpdir/node-${t}.tar.gz"
         if (
@@ -92,7 +106,7 @@ install() {
           rm -f "$tmptarball"
         )
         then
-          jsenv-version-file-write .node-version "$VERSION"
+          jsenv-version-file-write .node-version "$PRODUCT-$VERSION"
           return;
         else
           echo "Binary download failed, trying source." >&2
@@ -117,10 +131,10 @@ install() {
   local tmpdir="/tmp/src"
   local tmptarball="$tmpdir/node-$VERSION.tar.gz"
 
-  if [ "`curl -Is "http://nodejs.org/dist/v$VERSION/node-v$VERSION.tar.gz" | \grep '200 OK'`" != '' ]; then
-    tarball="http://nodejs.org/dist/v$VERSION/node-v$VERSION.tar.gz"
-  elif [ "`curl -Is "http://nodejs.org/dist/node-v$VERSION.tar.gz" | \grep '200 OK'`" != '' ]; then
-    tarball="http://nodejs.org/dist/node-v$VERSION.tar.gz"
+  if [ "`curl -Is "http://$GROUPjs.org/dist/v$VERSION/$PRODUCT-v$VERSION.tar.gz" | \grep '200 OK'`" != '' ]; then
+    tarball="http://$GROUPjs.org/dist/v$VERSION/node-v$VERSION.tar.gz"
+  elif [ "`curl -Is "http://$GROUPjs.org/dist/$PRODUCT-v$VERSION.tar.gz" | \grep '200 OK'`" != '' ]; then
+    tarball="http://$GROUPjs.org/dist/node-v$VERSION.tar.gz"
   fi
 
   if (
@@ -135,7 +149,7 @@ install() {
     $make install
   )
   then
-    jsenv-version-file-write .node-version "$VERSION"
+    jsenv-version-file-write .node-version "$PRODUCT-$VERSION"
     if ! which npm ; then
       if [[ "`expr match $VERSION '\(^v0\.1\.\)'`" != '' ]]; then
         echo "npm requires node v0.2.3 or higher"
