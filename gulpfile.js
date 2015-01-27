@@ -16,7 +16,7 @@ gulp.task( 'default', function () {
     var version = require( './package.json' ).version;
     var filename = './dist/jsenv-' + version + '.tar.gz';
     var contents = require( 'fs' ).readFileSync( filename );
-    gulp.src( './tmpl/buildr.rb' )
+    gulp.src( './tmpl/jsenv.rb' )
       .pipe( tmpl( {
                      version : version,
                      shasum  : shasum( contents )
