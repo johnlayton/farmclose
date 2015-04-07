@@ -2,8 +2,7 @@
 # Summary: Show the current Node version and its origin
 #
 # Shows the currently selected Node version and how it was
-# selected. To obtain only the version string, use `rbenv
-# version-name'.
+# selected. To obtain only the version string, use `jsenv version-name'.
 
 set -e
 [ -n "$JSENV_DEBUG" ] && set -x
