@@ -65,7 +65,9 @@ install() {
     VERSION="`curl -X GET http://semver.io/node/unstable`"
   elif ([ $1 == stable ] && [ $PRODUCT == "node" ]); then
     VERSION="`curl -X GET http://semver.io/node/stable`"
-  elif ([ $1 == latest ] && [ $PRODUCT == "iojs" ]); then
+  elif ([ $1 == unstable ] && [ $PRODUCT == "iojs" ]); then
+    VERSION="`curl -X GET http://semver.io/iojs/unstable`"
+  elif ([ $1 == stable ] && [ $PRODUCT == "iojs" ]); then
     VERSION="`curl -X GET http://semver.io/iojs/stable`"
   else
     VERSION="$@"
