@@ -69,7 +69,10 @@ or via Homebrew, you should be able to:
 
 ~~~ sh
 # install a Node version:
-$ jsenv install 0.10.26
+$ jsenv install node 0.10.26
+
+# install an IoJS version:
+$ jsenv install iojs 2.2.1
 ~~~
 
 Alternatively to the `install` command, you can download and compile
