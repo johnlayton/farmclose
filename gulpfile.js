@@ -7,11 +7,7 @@ var spawn = require( 'child_process' ).spawn;
 var version = require( './package.json' ).version;
 
 gulp.task( 'default', function () {
-  tar = spawn( 'tar', [
-    '-cpvzf',
-    'dist/jsenv-' + version + '.tar.gz',
-    'jsenv'
-  ] );
+  tar = spawn( 'tar', ['-cpvzf', 'dist/jsenv-' + version + '.tar.gz', 'jsenv'] );
   tar.on( 'close', function ( code ) {
     var version = require( './package.json' ).version;
     var filename = './dist/jsenv-' + version + '.tar.gz';
