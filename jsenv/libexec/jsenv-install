@@ -106,7 +106,7 @@ install() {
           rm -f "$tmptarball"
         )
         then
-          jsenv-version-file-write .node-version "$PRODUCT-$VERSION"
+          jsenv-version-file-write .jsenv-version "$PRODUCT-$VERSION"
           return;
         else
           echo "Binary download failed, trying source." >&2
@@ -149,7 +149,7 @@ install() {
     $make install
   )
   then
-    jsenv-version-file-write .node-version "$PRODUCT-$VERSION"
+    jsenv-version-file-write .jsenv-version "$PRODUCT-$VERSION"
     if ! which npm ; then
       if [[ "`expr match $VERSION '\(^v0\.1\.\)'`" != '' ]]; then
         echo "npm requires node v0.2.3 or higher"

@@ -1,29 +1,29 @@
 {
-  "name"            : "farmclose",
-  "version"         : "0.1.1",
-  "description"     : "RBEnv for Node",
-  "main"            : "index.js",
-  "dependencies"    : {
+  "name"           : "farmclose",
+  "version"        : "0.1.2",
+  "description"    : "RBEnv for Node",
+  "main"           : "index.js",
+  "dependencies"   : {
   },
-  "devDependencies" : {
-    "gulp"          : "^3.6.2",
-    "shasum"        : "^1.0.0",
-    "gulp-tar"      : "^0.4.0",
-    "gulp-template" : "^0.1.1",
-    "gulp-gzip"     : "0.0.8",
-    "gulp-filter"   : "^0.4.1"
+  "devDependencies": {
+    "gulp"         : "^3.6.2",
+    "shasum"       : "^1.0.0",
+    "gulp-tar"     : "^0.4.0",
+    "gulp-template": "^0.1.1",
+    "gulp-gzip"    : "0.0.8",
+    "gulp-filter"  : "^0.4.1"
   },
-  "scripts"         : {
-    "test" : "echo \"Error: no test specified\" && exit 1"
+  "scripts"        : {
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository"      : {
-    "type" : "git",
-    "url"  : "https://github.com/johnlayton/farmclose.git"
+  "repository"     : {
+    "type": "git",
+    "url" : "https://github.com/johnlayton/farmclose.git"
   },
-  "author"          : "",
-  "license"         : "ISC",
-  "bugs"            : {
-    "url" : "https://github.com/johnlayton/farmclose/issues"
+  "author"         : "",
+  "license"        : "ISC",
+  "bugs"           : {
+    "url": "https://github.com/johnlayton/farmclose/issues"
   },
-  "homepage"        : "https://github.com/johnlayton/farmclose"
+  "homepage"       : "https://github.com/johnlayton/farmclose"
 }

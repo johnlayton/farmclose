@@ -39,12 +39,12 @@ if [ "$JSENV_VERSION" = "--unset" ]; then
   rm -f .node-version .jsenv-version
 elif [ -n "$JSENV_VERSION" ]; then
   if [ "$(JSENV_VERSION= jsenv-version-origin)" -ef .jsenv-version ]; then
-    rm -f .jsenv-version
-    { echo "jsenv: removed existing \`.jsenv-version' file and migrated"
-      echo "       local version specification to \`.node-version' file"
+    rm -f .node-version
+    { echo "jsenv: removed existing \`.node-version' file and migrated"
+      echo "       local version specification to \`.jsenv-version' file"
     } >&2
   fi
-  jsenv-version-file-write .node-version "$JSENV_VERSION"
+  jsenv-version-file-write .jsenv-version "$JSENV_VERSION"
 else
   jsenv-version-file-read .node-version ||
   jsenv-version-file-read .jsenv-version ||
