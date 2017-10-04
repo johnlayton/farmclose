@@ -11,13 +11,13 @@ If you're on Mac OS X, consider
 1. Install using brew command
 
     ~~~ sh
-    $ brew install https://raw.github.com/johnlayton/farmclose/master/jsenv.rb
+    $ brew install https://raw.githubusercontent.com/johnlayton/hartavenue/master/Formula/farmclose.rb
     ~~~
 
 2. Upgrade using brew command
 
     ~~~ sh
-    $ brew upgrade https://raw.github.com/johnlayton/farmclose/master/jsenv.rb
+    $ brew upgrade https://raw.githubusercontent.com/johnlayton/hartavenue/master/Formula/farmclose.rb
     ~~~
 
 ### Basic GitHub Checkout
