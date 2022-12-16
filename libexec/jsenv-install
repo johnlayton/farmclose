@@ -12,15 +12,15 @@ install() {
   case "$uname" in
     Linux\ *)   os=linux ;;
     Darwin\ *)  os=darwin ;;
-    SunOS\ *)   os=sunos ;;
-    FreeBSD\ *) os=freebsd ;;
+#    SunOS\ *)   os=sunos ;;
+#    FreeBSD\ *) os=freebsd ;;
   esac
 
   local arch="$(uname -m)"
   case "$arch" in
     *x86_64*) arch=x64 ;;
     *i*86*)   arch=x86 ;;
-    *armv6l*) arch=arm-pi ;;
+#    *armv6l*) arch=arm-pi ;;
   esac
     #*armv6l*) arch=x86 ;;
 
@@ -28,7 +28,7 @@ install() {
   local GROUP
   local PRODUCT
   local VERSION
-  local ADDITIONAL_PARAMETERS
+#  local ADDITIONAL_PARAMETERS
 
   local binavail
   local url
@@ -39,134 +39,163 @@ install() {
     echo 'jsenv needs curl to proceed.' >&2;
   fi
 
+  if [ ! `which jq` ]; then
+    echo 'jsenv needs jq to proceed.' >&2;
+  fi
+
   if [ $# -lt 1 ]; then
     return
   fi
 
-  nobinary=0
-  if [ "$1" = "-s" ]; then
-    nobinary=1
-    shift
-  fi
-  if [ "$os" = "freebsd" ]; then
-    nobinary=1
-  fi
+#  nobinary=0
+#  if [ "$1" = "-s" ]; then
+#    nobinary=1
+#    shift
+#  fi
+#  if [ "$os" = "freebsd" ]; then
+#    nobinary=1
+#  fi
 
   if [[ $1 == "node" ]]; then
     GROUP="nodejs"
     PRODUCT="node"
-  elif ([ $1 == "iojs" ] || [ $1 == "io" ]); then
-    GROUP="iojs"
-    PRODUCT="iojs"
+#  elif ([ $1 == "iojs" ] || [ $1 == "io" ]); then
+#    GROUP="iojs"
+#    PRODUCT="iojs"
   fi
   shift
 
-  if ([ $1 == unstable ] && [ $PRODUCT == "node" ]); then
-    VERSION="`curl -X GET http://semver.io/node/unstable`"
-  elif ([ $1 == stable ] && [ $PRODUCT == "node" ]); then
-    VERSION="`curl -X GET http://semver.io/node/stable`"
-  elif ([ $1 == unstable ] && [ $PRODUCT == "iojs" ]); then
-    VERSION="`curl -X GET http://semver.io/iojs/unstable`"
-  elif ([ $1 == stable ] && [ $PRODUCT == "iojs" ]); then
-    VERSION="`curl -X GET http://semver.io/iojs/stable`"
-  else
-    VERSION="$@"
-  fi
+  VERSION="$@"
   shift
-
-  ADDITIONAL_PARAMETERS=''
-  while [ $# -ne 0 ]
-  do
-    ADDITIONAL_PARAMETERS="$ADDITIONAL_PARAMETERS $1"
-    shift
-  done
-
+#  if ([ $1 == unstable ] && [ $PRODUCT == "node" ]); then
+#    VERSION="`curl -X GET http://semver.io/node/unstable`"
+#  elif ([ $1 == stable ] && [ $PRODUCT == "node" ]); then
+#    VERSION="`curl -X GET http://semver.io/node/stable`"
+#  elif ([ $1 == unstable ] && [ $PRODUCT == "iojs" ]); then
+#    VERSION="`curl -X GET http://semver.io/iojs/unstable`"
+#  elif ([ $1 == stable ] && [ $PRODUCT == "iojs" ]); then
+#    VERSION="`curl -X GET http://semver.io/iojs/stable`"
+#  else
+#    VERSION="$@"
+#  fi
+#  shift
+#
+#  ADDITIONAL_PARAMETERS=''
+#  while [ $# -ne 0 ]
+#  do
+#    ADDITIONAL_PARAMETERS="$ADDITIONAL_PARAMETERS $1"
+#    shift
+#  done
+#
   [ -d "${JSENV_ROOT}/versions/$PRODUCT-$VERSION" ] && echo "$PRODUCT-$VERSION is already installed." && return
 
-  if [ $nobinary -ne 1 ]; then
 
-    if [ -n "$os" ]; then
-      binavail=
-      case "$VERSION" in
-        v0.8.[012345])  binavail=0 ;;
-        v0.[1234567].*) binavail=0 ;;
-        *) binavail=1 ;;
-      esac
-      if [ $binavail -eq 1 ]; then
-        t="$VERSION-$os-$arch"
-        url="http://${GROUP}.org/dist/v$VERSION/$PRODUCT-v${t}.tar.gz"
-        local tmpdir="/tmp/node-${t}"
-        local tmptarball="$tmpdir/node-${t}.tar.gz"
-        if (
-          echo $url && \
-          mkdir -p "$tmpdir" && \
-          curl -L -C - --progress-bar $url -o "$tmptarball" && \
-          tar -xzf "$tmptarball" -C "$tmpdir" --strip-components 1 && \
-          mv "$tmpdir" "${JSENV_ROOT}/versions/$PRODUCT-$VERSION" && \
-          rm -f "$tmptarball"
-        )
-        then
-          jsenv-version-file-write .jsenv-version "$PRODUCT-$VERSION"
-          return;
-        else
-          echo "Binary download failed, trying source." >&2
-          rm -rf "$tmptarball" "$tmpdir"
-        fi
-      fi
-    fi
-
-  fi
-
-  if [ ! `which git` ]; then
-    echo 'jsenv needs git to proceed.' >&2;
-  fi
-
-  echo "Additional options while compiling: $ADDITIONAL_PARAMETERS"
-
-  tarball=''
-  make='make'
-  if [ "$os" = "freebsd" ]; then
-    make='gmake'
-  fi
-  local tmpdir="/tmp/src"
-  local tmptarball="$tmpdir/node-$VERSION.tar.gz"
-
-  if [ "`curl -Is "http://$GROUP.org/dist/v$VERSION/$PRODUCT-v$VERSION.tar.gz" | \grep '200 OK'`" != '' ]; then
-    tarball="http://$GROUP.org/dist/v$VERSION/node-v$VERSION.tar.gz"
-  elif [ "`curl -Is "http://$GROUP.org/dist/$PRODUCT-v$VERSION.tar.gz" | \grep '200 OK'`" != '' ]; then
-    tarball="http://$GROUP.org/dist/$PRODUCT-v$VERSION.tar.gz"
-  fi
-
+  t="$VERSION-$os-$arch"
+  url="http://${GROUP}.org/dist/v$VERSION/$PRODUCT-v${t}.tar.gz"
+  local tmpdir="/tmp/node-${t}"
+  local tmptarball="$tmpdir/node-${t}.tar.gz"
   if (
-    [ ! -z $tarball ] && \
+    echo $url && \
     mkdir -p "$tmpdir" && \
-    curl --progress-bar $tarball -o "$tmptarball" && \
-    tar -xzf "$tmptarball" -C "$tmpdir" && \
-    cd "$tmpdir/node-v$VERSION" && \
-    ./configure --prefix="${JSENV_ROOT}/versions/$PRODUCT-$VERSION" $ADDITIONAL_PARAMETERS && \
-    $make && \
-    rm -f "${JSENV_ROOT}/versions/$PRODUCT-$VERSION" 2>/dev/null && \
-    $make install
+    curl -L -C - --progress-bar $url -o "$tmptarball" && \
+    tar -xzf "$tmptarball" -C "$tmpdir" --strip-components 1 && \
+    mv "$tmpdir" "${JSENV_ROOT}/versions/$PRODUCT-$VERSION" && \
+    rm -f "$tmptarball"
   )
   then
     jsenv-version-file-write .jsenv-version "$PRODUCT-$VERSION"
-    if ! which npm ; then
-      if [[ "`expr match $VERSION '\(^v0\.1\.\)'`" != '' ]]; then
-        echo "npm requires node v0.2.3 or higher"
-      elif [[ "`expr match $VERSION '\(^v0\.2\.\)'`" != '' ]]; then
-        if [[ "`expr match $VERSION '\(^v0\.2\.[0-2]$\)'`" != '' ]]; then
-          echo "npm requires node v0.2.3 or higher"
-        else
-          curl https://npmjs.org/install.sh | clean=yes npm_install=0.2.19 sh
-        fi
-      else
-        curl https://www.npmjs.org/install.sh | clean=yes sh
-      fi
-    fi
+    return;
   else
-    echo "jsenv: install $VERSION failed!"
-    return 1
+    echo "Binary download failed, trying source." >&2
+    rm -rf "$tmptarball" "$tmpdir"
   fi
+
+
+#
+#  if [ $nobinary -ne 1 ]; then
+#
+#    if [ -n "$os" ]; then
+#      binavail=
+#      case "$VERSION" in
+#        v0.8.[012345])  binavail=0 ;;
+#        v0.[1234567].*) binavail=0 ;;
+#        *) binavail=1 ;;
+#      esac
+#      if [ $binavail -eq 1 ]; then
+#        t="$VERSION-$os-$arch"
+#        url="http://${GROUP}.org/dist/v$VERSION/$PRODUCT-v${t}.tar.gz"
+#        local tmpdir="/tmp/node-${t}"
+#        local tmptarball="$tmpdir/node-${t}.tar.gz"
+#        if (
+#          echo $url && \
+#          mkdir -p "$tmpdir" && \
+#          curl -L -C - --progress-bar $url -o "$tmptarball" && \
+#          tar -xzf "$tmptarball" -C "$tmpdir" --strip-components 1 && \
+#          mv "$tmpdir" "${JSENV_ROOT}/versions/$PRODUCT-$VERSION" && \
+#          rm -f "$tmptarball"
+#        )
+#        then
+#          jsenv-version-file-write .jsenv-version "$PRODUCT-$VERSION"
+#          return;
+#        else
+#          echo "Binary download failed, trying source." >&2
+#          rm -rf "$tmptarball" "$tmpdir"
+#        fi
+#      fi
+#    fi
+#
+#  fi
+#
+#  if [ ! `which git` ]; then
+#    echo 'jsenv needs git to proceed.' >&2;
+#  fi
+#
+#  echo "Additional options while compiling: $ADDITIONAL_PARAMETERS"
+#
+#  tarball=''
+#  make='make'
+#  if [ "$os" = "freebsd" ]; then
+#    make='gmake'
+#  fi
+#  local tmpdir="/tmp/src"
+#  local tmptarball="$tmpdir/node-$VERSION.tar.gz"
+#
+#  if [ "`curl -Is "http://$GROUP.org/dist/v$VERSION/$PRODUCT-v$VERSION.tar.gz" | \grep '200 OK'`" != '' ]; then
+#    tarball="http://$GROUP.org/dist/v$VERSION/node-v$VERSION.tar.gz"
+#  elif [ "`curl -Is "http://$GROUP.org/dist/$PRODUCT-v$VERSION.tar.gz" | \grep '200 OK'`" != '' ]; then
+#    tarball="http://$GROUP.org/dist/$PRODUCT-v$VERSION.tar.gz"
+#  fi
+#
+#  if (
+#    [ ! -z $tarball ] && \
+#    mkdir -p "$tmpdir" && \
+#    curl --progress-bar $tarball -o "$tmptarball" && \
+#    tar -xzf "$tmptarball" -C "$tmpdir" && \
+#    cd "$tmpdir/node-v$VERSION" && \
+#    ./configure --prefix="${JSENV_ROOT}/versions/$PRODUCT-$VERSION" $ADDITIONAL_PARAMETERS && \
+#    $make && \
+#    rm -f "${JSENV_ROOT}/versions/$PRODUCT-$VERSION" 2>/dev/null && \
+#    $make install
+#  )
+#  then
+#    jsenv-version-file-write .jsenv-version "$PRODUCT-$VERSION"
+#    if ! which npm ; then
+#      if [[ "`expr match $VERSION '\(^v0\.1\.\)'`" != '' ]]; then
+#        echo "npm requires node v0.2.3 or higher"
+#      elif [[ "`expr match $VERSION '\(^v0\.2\.\)'`" != '' ]]; then
+#        if [[ "`expr match $VERSION '\(^v0\.2\.[0-2]$\)'`" != '' ]]; then
+#          echo "npm requires node v0.2.3 or higher"
+#        else
+#          curl https://npmjs.org/install.sh | clean=yes npm_install=0.2.19 sh
+#        fi
+#      else
+#        curl https://www.npmjs.org/install.sh | clean=yes sh
+#      fi
+#    fi
+#  else
+#    echo "jsenv: install $VERSION failed!"
+#    return 1
+#  fi
 }
 
 echo "Install Node $@"

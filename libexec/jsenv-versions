@@ -36,10 +36,25 @@ if [ -n "$include_system" ] && JSENV_VERSION=system jsenv-which node >/dev/null 
   print_version system
 fi
 
-for path in `curl -s -X GET https://semver.io/node/versions`; do
- print_version "node-${path##*/}"
+for path in $(curl --silent \
+  --header "Authorization: Bearer ${GITHUB_API_TOKEN}" \
+  --header "Accept: application/vnd.github+json" \
+  --request GET https://api.github.com/repos/nodejs/node/releases\?per_page\=400 \
+  | jq -r '.[] | .tag_name |= (sub("v";"")) | .tag_name' | sort -n); do
+  print_version "node-${path##*/}"
 done
 
-for path in `curl -s -X GET https://semver.io/iojs/versions`; do
- print_version "iojs-${path##*/}"
-done
+
+#https://nodejs.org/dist
+#
+#for path in `curl -s -X GET https://semver.io/node/versions`; do
+# print_version "node-${path##*/}"
+#done
+#
+#for path in `curl -s -X GET https://semver.io/node/versions`; do
+# print_version "node-${path##*/}"
+#done
+#
+#for path in `curl -s -X GET https://semver.io/iojs/versions`; do
+# print_version "iojs-${path##*/}"
+#done
